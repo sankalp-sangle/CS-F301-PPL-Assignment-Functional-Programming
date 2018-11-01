@@ -107,7 +107,7 @@ object Driver{
 // THIS COMMENTED SECTION CAN BE REMOVED TO TIME YOUR CODE. TOP LINE AFTER REMOVING THIS WILL BE YOUR TIMED OUTPUT. 
 //  COMMENT NEXT LINE WHEN YOU UNCOMMENT THIS
 // val res8=time{F2016A7PS0110P.assembly(image,imagesize,w1,w2,b,kernel1,kernel1size,kernel2,kernel2size,kernel3,kernel3size,size)}
-    // val res8=F2016A7PS0110P.assembly(image,imagesize,w1,w2,b,kernel1,kernel1size,kernel2,kernel2size,kernel3,kernel3size,size)
+    val res8=F2016A7PS0110P.assembly(image,imagesize,w1,w2,b,kernel1,kernel1size,kernel2,kernel2size,kernel3,kernel3size,size)
 
     println("res1")
     println(res1)
@@ -123,8 +123,8 @@ object Driver{
     println(res6)
     println("res7")
     println(res7)
-    // println("res8")
-    // println(res8)
-    //}
+    println("res8")
+    println(res8)
+    }
   }
-}
+

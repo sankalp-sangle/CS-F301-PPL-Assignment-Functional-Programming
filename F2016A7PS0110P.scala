@@ -3,11 +3,16 @@ package pplAssignment
 object F2016A7PS0110P {
     //Start Coding from here
 
-    def computeRow(row_1 : List[Double], row_2 : List[Double], acc: Double) : Double = row_1 match {
-        case i::rest => computeRow(row_1.tail, row_2.tail, acc + row_1.head * row_2.head)
-        case Nil => acc
-    } 
+    // def computeRow(row_1 : List[Double], row_2 : List[Double], acc: Double) : Double = row_1 match {
+    //     case i::rest => computeRow(row_1.tail, row_2.tail, acc + row_1.head * row_2.head)
+    //     case Nil => acc
+    // } 
     
+    def computeRow(row_1 : List[Double], row_2 : List[Double], acc: Double) : Double =  {
+        if(row_1.isEmpty) acc
+        else computeRow(row_1.tail, row_2.tail, acc + row_1.head * row_2.head)
+    }
+
     // def dotProductHelper( matrix_1 : List[List[Double]], matrix_2 : List[List[Double]], acc : Double ) : Double = matrix_1 match {
     //     case row::rest => dotProductHelper( matrix_1.tail, matrix_2.tail, acc + computeRow(matrix_1.head, matrix_2.head, 0) )
     //     case Nil => acc
@@ -45,7 +50,7 @@ object F2016A7PS0110P {
 
     def slice_Image( Image : List[List[Double]], kernelSize : List[Int], xcoord : Int) : List[List[Double]] = {
         Image match {
-            case row::rest => getFirstN( drop(row, xcoord) , kernelSize.head) :: slice_Image( Image.tail, kernelSize, xcoord)
+            case row::rest => getFirstN( drop(row, xcoord) , getLastElement(kernelSize)) :: slice_Image( Image.tail, kernelSize, xcoord)
             case Nil => Nil
         }
     }
@@ -63,7 +68,7 @@ object F2016A7PS0110P {
     // }
 
     def convoluteHelper( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], convolutedImage : List[List[Double]], ycoord : Int) : List[List[Double]] = {
-        if(ycoord == getLastElement(imageSize) - getLastElement(kernelSize) + 1) convolutedImage
+        if(ycoord == imageSize.head - kernelSize.head + 1) convolutedImage
         else convoluteHelper(Image.tail, Kernel, imageSize, kernelSize, List.concat(convolutedImage, List(convoluteRow(Image, Kernel, imageSize, kernelSize, 0))), ycoord + 1)
     }
 
@@ -162,8 +167,43 @@ object F2016A7PS0110P {
         poolingLayer(poolingFunc, activationLayer( activationFunc, convolute( Image, Kernel, imageSize, kernelSize)), K)
     }
     
-    def assembly( Image:List[List[Double]],imageSize:List[Int],w1:Double,w2:Double,b:Double,Kernel1:List[List[Double]],kernelSize1:List[Int],Kernel2:List[List[Double]],kernelSize2:List[Int],Kernel3:List[List[Double]],kernelSize3:List[Int],Size: Int) : List[List[Int]] = {
+    def addBiasToRow(b : Double, row : List[Double], biasedRow : List[Double]) : List[Double] = {
+        if ( row.isEmpty ) biasedRow
+        else addBiasToRow( b, row.tail, List.concat(biasedRow, List( b + row.head)))
+    }
 
+    def addBiasToMatrix(b : Double, matrix : List[List[Double]], answer : List[List[Double]]) : List[List[Double]] = {
+        if ( matrix.isEmpty ) answer
+        else addBiasToMatrix(b, matrix.tail, List.concat(answer, List(addBiasToRow(b, matrix.head, List() ))))
+    }
+
+    def scalarMultiplyRow(w : Double, row : List[Double], multipliedRow : List[Double]) : List[Double] = {
+        if ( row.isEmpty ) multipliedRow
+        else scalarMultiplyRow(w, row.tail, List.concat(multipliedRow, List( w * row.head)))
+    }
+
+    def scalarMultiply(w : Double, matrix : List[List[Double]], answer : List[List[Double]]) : List[List[Double]] = {
+        if ( matrix.isEmpty ) answer
+        else scalarMultiply(w, matrix.tail, List.concat(answer, List(scalarMultiplyRow(w, matrix.head, List() ))))
+    }
+
+    def addRows(row1 : List[Double], row2 : List[Double], addedRow : List[Double]) : List[Double] = {
+        if ( row1.isEmpty ) addedRow
+        else addRows( row1.tail, row2.tail, List.concat(addedRow, List( row1.head + row2.head)))
+    }
+
+    def addMatrices(matrix1 : List[List[Double]], matrix2 : List[List[Double]], answer : List[List[Double]]) : List[List[Double]] = {
+        if ( matrix1.isEmpty ) answer
+        else addMatrices(matrix1.tail, matrix2.tail, List.concat(answer, List(addRows(matrix1.head, matrix2.head, List() ))))
+    }
+
+    def poolingFunctionAverage(l : List[Double]) : Double = l match {
+        case Nil => 0
+        case x::tail => (x + poolingFunctionAverage(tail) * tail.length) / (l.length)
+    }
+
+    def assembly( Image:List[List[Double]], imageSize:List[Int], w1:Double, w2:Double, b:Double, Kernel1:List[List[Double]], kernelSize1:List[Int], Kernel2:List[List[Double]], kernelSize2:List[Int], Kernel3:List[List[Double]], kernelSize3:List[Int], Size: Int) : List[List[Int]] = {
+        normalise( mixedLayer( addBiasToMatrix(b, addMatrices( scalarMultiply(w1, mixedLayer(Image, Kernel1, imageSize, kernelSize1, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), scalarMultiply(w2, mixedLayer(Image, Kernel2, imageSize, kernelSize2, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), List() ), List() ), Kernel3, imageSize, kernelSize3, (x:Double) => if(x>0) x else 0.5 * x, getMaxInRow, Size ) )
     }
 
 }
