@@ -203,7 +203,8 @@ object F2016A7PS0110P {
     }
 
     def assembly( Image:List[List[Double]], imageSize:List[Int], w1:Double, w2:Double, b:Double, Kernel1:List[List[Double]], kernelSize1:List[Int], Kernel2:List[List[Double]], kernelSize2:List[Int], Kernel3:List[List[Double]], kernelSize3:List[Int], Size: Int) : List[List[Int]] = {
-        normalise( mixedLayer( addBiasToMatrix(b, addMatrices( scalarMultiply(w1, mixedLayer(Image, Kernel1, imageSize, kernelSize1, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), scalarMultiply(w2, mixedLayer(Image, Kernel2, imageSize, kernelSize2, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), List() ), List() ), Kernel3, imageSize, kernelSize3, (x:Double) => if(x>0) x else 0.5 * x, getMaxInRow, Size ) )
+        val intermediate = mixedLayer(Image, Kernel1, imageSize, kernelSize1, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size )
+        normalise( mixedLayer( addBiasToMatrix(b, addMatrices( scalarMultiply(w1, intermediate, List() ), scalarMultiply(w2, mixedLayer(Image, Kernel2, imageSize, kernelSize2, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), List() ), List() ), Kernel3, List(intermediate.length,intermediate.head.length), kernelSize3, (x:Double) => if(x>0) x else 0.5 * x, getMaxInRow, Size ) )
     }
 
 }
