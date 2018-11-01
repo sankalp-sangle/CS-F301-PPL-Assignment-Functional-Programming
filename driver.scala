@@ -83,18 +83,18 @@ object Driver{
 
     // //single pooling
 
-    // val res4=F2016A7PS0110P.singlePooling(max,poolmat,size)
+    val res4=F2016A7PS0110P.singlePooling(max,poolmat,size)
     // //pooling
 
-    // val res5=F2016A7PS0110P.poolingLayer(max,image,size) // max is a function
+    val res5=F2016A7PS0110P.poolingLayer(max,image,size) // max is a function
 
     // //Normalize
 
-    // val res6=F2016A7PS0110P.normalise(nmat) 
+    val res6=F2016A7PS0110P.normalise(nmat) 
 
     // //mixed layer
 
-    // val res7=F2016A7PS0110P.mixedLayer(image,kernel1,imagesize,kernel1size,(x:Double)=>x,max,size) // max is a function
+    val res7=F2016A7PS0110P.mixedLayer(image,kernel1,imagesize,kernel1size,(x:Double)=>x,max,size) // max is a function
 
     //assembly layer
     def time[R](block: => R): R = {
@@ -115,14 +115,14 @@ object Driver{
     println(res2)    
     println("res3")
     println(res3)    
-    // println("res4")
-    // println(res4)    
-    // println("res5")
-    // println(res5)    
-    // println("res6")
-    // println(res6)
-    // println("res7")
-    // println(res7)
+    println("res4")
+    println(res4)    
+    println("res5")
+    println(res5)    
+    println("res6")
+    println(res6)
+    println("res7")
+    println(res7)
     // println("res8")
     // println(res8)
     //}

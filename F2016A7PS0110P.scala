@@ -22,14 +22,20 @@ object F2016A7PS0110P {
         dotProductHelper(matrix_1, matrix_2, 0)
     }
 
-    def drop(l: List[Double], n: Int): List[Double] = {
+    def drop[A](l: List[A], n: Int): List[A] = {
         if(n==0) l
         else drop(l.tail, n-1)
     }
 
-    def getFirstN(l: List[Double], n: Int): List[Double] = n match {
-        case 0 => Nil
-        case _ => l.head :: getFirstN(l.tail, n-1)
+    // def getFirstN(l: List[Double], n: Int): List[Double] = n match{
+    //     case 0 => Nil
+    //     case _ => l.head :: getFirstN(l.tail, n-1)
+    // }
+
+    def getFirstN[A](l: List[A], n: Int): List[A] = {
+        if(l.isEmpty) l
+        else if (n == 0) Nil
+        else l.head :: getFirstN(l.tail, n-1)
     }
 
     def getLastElement(l : List[Int]) : Int = l match {
@@ -77,6 +83,87 @@ object F2016A7PS0110P {
 
     def activationLayer( activationFunc : Double => Double, Image : List[List[Double]] ) : List[List[Double]] = {
         activationHelper( activationFunc, Image : List[List[Double]], List())
+    }
+
+    def slicer( Image : List[List[Double]], K : Int, xcoord : Int) : List[Double] = {
+        Image match {
+            case row::rest => getFirstN( drop(row, xcoord) , K) ::: slicer( Image.tail, K, xcoord)
+            case Nil => Nil
+        }
+    }
+    
+    def singlePoolingHelper( poolingFunc : List[Double] => Double, Image : List[List[Double]], K : Int, answer : List[Double], xcoord : Int) : List[Double] = {
+        if( slicer(Image, K, xcoord).isEmpty ) answer
+        else singlePoolingHelper(poolingFunc, Image, K, List.concat(answer, List(poolingFunc(slicer(Image, K, xcoord)))), xcoord + K)
+    }
+    
+    def singlePooling( poolingFunc : List[Double] => Double, Image : List[List[Double]], K : Int) : List[Double] = {
+        singlePoolingHelper(poolingFunc, Image, K, List(), 0)
+    }
+
+    def poolingLayerHelper( poolingFunc : List[Double] => Double, Image : List[List[Double]], K : Int , answer: List[List[Double]], ycoord : Int, originalSize : Int) : List[List[Double]] = {
+        if(ycoord == originalSize) answer
+        else poolingLayerHelper( poolingFunc, drop(Image, K), K, List.concat(answer, List(singlePooling(poolingFunc, getFirstN(Image, K), K))), ycoord + K, originalSize)
+    }
+    
+    def getSize[A](l : List[List[A]]) : Int = l match{
+        case first::rest => 1+getSize(l.tail)
+        case Nil => 0
+    }
+
+    def poolingLayer( poolingFunc : List[Double] => Double, Image : List[List[Double]], K : Int) : List[List[Double]] = {
+        poolingLayerHelper( poolingFunc, Image, K, List(), 0, getSize(Image))
+    }
+
+    def flatten(Image : List[List[Double]]) : List[Double] = {
+        if(Image.isEmpty) Nil
+        else Image.head ::: flatten(Image.tail)
+    }
+
+    def getMaxInRow(l: List[Double]): Double = l match {
+        case first :: rest => if(first > getMaxInRow(rest)) first
+                              else getMaxInRow(rest)
+        case Nil => -100000000  
+    }
+
+    def getMinInRow(l: List[Double]): Double = l match {
+        case first :: rest => if(first < getMinInRow(rest)) first
+                              else getMinInRow(rest)
+        case Nil => 100000000  
+    }    
+
+    def getMax(l : List[List[Double]], answer : Double) : Double = l match {
+        case row::rest => if(answer > getMaxInRow(row)) getMax( l.tail, answer)
+                          else getMax(l.tail, getMaxInRow(row))
+        case Nil => answer   
+    }
+
+    def getMin(l : List[List[Double]], answer : Double) : Double = l match {
+        case row::rest => if(answer < getMinInRow(row)) getMin( l.tail, answer)
+                          else getMin(l.tail, getMinInRow(row))
+        case Nil => answer   
+    }
+
+    def computeNormalisedRow(row : List[Double], maxi : Double, mini : Double, normalisedRow : List[Int]) : List[Int] = {
+        if(row.isEmpty) normalisedRow
+        else computeNormalisedRow( row.tail, maxi, mini, List.concat(normalisedRow, List( Math.round( (255.0 * (row.head - mini) / (maxi - mini))).toInt)))
+    }
+
+    def normaliseHelper(Image : List[List[Double]], answer : List[List[Int]], maxi : Double, mini : Double) : List[List[Int]] = {
+        if ( Image.isEmpty ) answer
+        else normaliseHelper(Image.tail, List.concat(answer, List(computeNormalisedRow(Image.head, maxi, mini, List()))), maxi, mini)
+    }
+
+    def normalise( Image : List[List[Double]] ) : List[List[Int]] = {
+        normaliseHelper(Image, List(), getMax(Image, -100000000.0), getMin(Image, 100000000.0))
+    }    
+
+    def mixedLayer( Image:List[List[Double]], Kernel:List[List[Double]], imageSize:List[Int], kernelSize:List[Int], activationFunc:Double => Double, poolingFunc:List[Double]=>Double, K:Int ) : List[List[Double]] = {
+        poolingLayer(poolingFunc, activationLayer( activationFunc, convolute( Image, Kernel, imageSize, kernelSize)), K)
+    }
+    
+    def assembly( Image:List[List[Double]],imageSize:List[Int],w1:Double,w2:Double,b:Double,Kernel1:List[List[Double]],kernelSize1:List[Int],Kernel2:List[List[Double]],kernelSize2:List[Int],Kernel3:List[List[Double]],kernelSize3:List[Int],Size: Int) : List[List[Int]] = {
+
     }
 
 }
