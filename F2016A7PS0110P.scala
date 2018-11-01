@@ -57,7 +57,7 @@ object F2016A7PS0110P {
 
     def convoluteRow( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], xcoord : Int) : List[Double] = {
         if(xcoord == getLastElement(imageSize) - getLastElement(kernelSize) + 1) Nil
-        else dotProduct( Kernel, slice_Image(Image, kernelSize, xcoord)) :: convoluteRow(Image, Kernel, imageSize, kernelSize, xcoord + 1)
+        else dotProduct(Kernel, slice_Image(Image, kernelSize, xcoord)) :: convoluteRow(Image, Kernel, imageSize, kernelSize, xcoord + 1)
     }
 
     // def convoluteHelper( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], convolutedImage : List[List[Double]]) : List[List[Double]] = {
