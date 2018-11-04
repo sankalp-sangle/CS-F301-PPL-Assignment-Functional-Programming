@@ -32,16 +32,14 @@ object F2016A7PS0110P {
         case _ => getLastElement(l.tail)
     }
 
-    def slice_Image( Image : List[List[Double]], kernelSize : List[Int], xcoord : Int) : List[List[Double]] = {
-        Image match {
-            case row::rest => getFirstN( drop(row, xcoord) , getLastElement(kernelSize)) :: slice_Image( Image.tail, kernelSize, xcoord)
-            case Nil => Nil
-        }
+    def slice_Image( Image : List[List[Double]], kernelSize : List[Int], xcoord : Int, rowsTaken : Int) : List[List[Double]] = {
+        if(rowsTaken == kernelSize.head) Nil
+        else getFirstN( drop(Image.head, xcoord) , getLastElement(kernelSize)) :: slice_Image( Image.tail, kernelSize, xcoord, rowsTaken + 1)
     }
 
     def convoluteRow( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], xcoord : Int) : List[Double] = {
         if(xcoord == getLastElement(imageSize) - getLastElement(kernelSize) + 1) Nil
-        else dotProduct(Kernel, slice_Image(Image, kernelSize, xcoord)) :: convoluteRow(Image, Kernel, imageSize, kernelSize, xcoord + 1)
+        else dotProduct(Kernel, slice_Image(Image, kernelSize, xcoord, 0)) :: convoluteRow(Image, Kernel, imageSize, kernelSize, xcoord + 1)
     }
 
     def convoluteHelper( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], convolutedImage : List[List[Double]], ycoord : Int) : List[List[Double]] = {
