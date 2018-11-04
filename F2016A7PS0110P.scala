@@ -98,13 +98,13 @@ object F2016A7PS0110P {
     def getMaxInRow(l: List[Double]): Double = l match {
         case first :: rest => if(first > getMaxInRow(rest)) first
                               else getMaxInRow(rest)
-        case Nil => -100000000  
+        case Nil => Double.MinValue  
     }
 
     def getMinInRow(l: List[Double]): Double = l match {
         case first :: rest => if(first < getMinInRow(rest)) first
                               else getMinInRow(rest)
-        case Nil => 100000000  
+        case Nil => Double.MaxValue  
     }    
 
     def getMax(l : List[List[Double]], answer : Double) : Double = l match {
@@ -130,7 +130,7 @@ object F2016A7PS0110P {
     }
 
     def normalise( Image : List[List[Double]] ) : List[List[Int]] = {
-        normaliseHelper(Image, List(), getMax(Image, -100000000.0), getMin(Image, 100000000.0))
+        normaliseHelper(Image, List(), getMax(Image, Double.MinValue), getMin(Image, Double.MaxValue))
     }    
 
     def mixedLayer( Image:List[List[Double]], Kernel:List[List[Double]], imageSize:List[Int], kernelSize:List[Int], activationFunc:Double => Double, poolingFunc:List[Double]=>Double, K:Int ) : List[List[Double]] = {
