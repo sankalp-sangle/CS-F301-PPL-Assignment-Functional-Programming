@@ -95,11 +95,6 @@ object F2016A7PS0110P {
         poolingLayerHelper( poolingFunc, Image, K, List(), 0, getSize(Image))
     }
 
-    def flatten(Image : List[List[Double]]) : List[Double] = {
-        if(Image.isEmpty) Nil
-        else Image.head ::: flatten(Image.tail)
-    }
-
     def getMaxInRow(l: List[Double]): Double = l match {
         case first :: rest => if(first > getMaxInRow(rest)) first
                               else getMaxInRow(rest)
@@ -178,8 +173,16 @@ object F2016A7PS0110P {
     }
 
     def assembly( Image:List[List[Double]], imageSize:List[Int], w1:Double, w2:Double, b:Double, Kernel1:List[List[Double]], kernelSize1:List[Int], Kernel2:List[List[Double]], kernelSize2:List[Int], Kernel3:List[List[Double]], kernelSize3:List[Int], Size: Int) : List[List[Int]] = {
-        val intermediate = mixedLayer(Image, Kernel1, imageSize, kernelSize1, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size )
-        normalise( mixedLayer( addBiasToMatrix(b, addMatrices( scalarMultiply(w1, intermediate, List() ), scalarMultiply(w2, mixedLayer(Image, Kernel2, imageSize, kernelSize2, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size ), List() ), List() ), List() ), Kernel3, List(intermediate.length,intermediate.head.length), kernelSize3, (x:Double) => if(x>0) x else 0.5 * x, getMaxInRow, Size ) )
+        
+        val intermediate1 = mixedLayer(Image, Kernel1, imageSize, kernelSize1, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size )
+        val intermediate2 = mixedLayer(Image, Kernel2, imageSize, kernelSize2, (x:Double) => if(x>0) x else 0, poolingFunctionAverage, Size )
+        
+        val scalarMultiplied1 = scalarMultiply(w1, intermediate1, List() )
+        val scalarMultiplied2 = scalarMultiply(w2, intermediate2, List() )
+        
+        val intermediate3 = addBiasToMatrix(b, addMatrices( scalarMultiplied1, scalarMultiplied2, List() ), List() )
+        
+        normalise( mixedLayer( intermediate3, Kernel3, List(intermediate1.length,intermediate1.head.length), kernelSize3, (x:Double) => if(x>0) x else 0.5 * x, getMaxInRow, Size ) )
     }
 
 }
