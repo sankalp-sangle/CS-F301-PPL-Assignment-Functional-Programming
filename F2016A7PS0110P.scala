@@ -1,22 +1,11 @@
 package pplAssignment
 
 object F2016A7PS0110P {
-    //Start Coding from here
-
-    // def computeRow(row_1 : List[Double], row_2 : List[Double], acc: Double) : Double = row_1 match {
-    //     case i::rest => computeRow(row_1.tail, row_2.tail, acc + row_1.head * row_2.head)
-    //     case Nil => acc
-    // } 
-    
+     
     def computeRow(row_1 : List[Double], row_2 : List[Double], acc: Double) : Double =  {
         if(row_1.isEmpty) acc
         else computeRow(row_1.tail, row_2.tail, acc + row_1.head * row_2.head)
     }
-
-    // def dotProductHelper( matrix_1 : List[List[Double]], matrix_2 : List[List[Double]], acc : Double ) : Double = matrix_1 match {
-    //     case row::rest => dotProductHelper( matrix_1.tail, matrix_2.tail, acc + computeRow(matrix_1.head, matrix_2.head, 0) )
-    //     case Nil => acc
-    // }
 
     def dotProductHelper( matrix_1 : List[List[Double]], matrix_2 : List[List[Double]], acc : Double ) : Double = {
         if ( matrix_1.isEmpty ) acc
@@ -31,11 +20,6 @@ object F2016A7PS0110P {
         if(n==0) l
         else drop(l.tail, n-1)
     }
-
-    // def getFirstN(l: List[Double], n: Int): List[Double] = n match{
-    //     case 0 => Nil
-    //     case _ => l.head :: getFirstN(l.tail, n-1)
-    // }
 
     def getFirstN[A](l: List[A], n: Int): List[A] = {
         if(l.isEmpty) l
@@ -59,13 +43,6 @@ object F2016A7PS0110P {
         if(xcoord == getLastElement(imageSize) - getLastElement(kernelSize) + 1) Nil
         else dotProduct(Kernel, slice_Image(Image, kernelSize, xcoord)) :: convoluteRow(Image, Kernel, imageSize, kernelSize, xcoord + 1)
     }
-
-    // def convoluteHelper( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], convolutedImage : List[List[Double]]) : List[List[Double]] = {
-    //     Image match {
-    //         case row::rest => convoluteHelper(Image.tail, Kernel, imageSize, kernelSize, convoluteRow(Image, Kernel, imageSize, kernelSize, 0)::convolutedImage)
-    //         case Nil => convolutedImage
-    //     }
-    // }
 
     def convoluteHelper( Image : List[List[Double]], Kernel : List[List[Double]], imageSize : List[Int], kernelSize : List[Int], convolutedImage : List[List[Double]], ycoord : Int) : List[List[Double]] = {
         if(ycoord == imageSize.head - kernelSize.head + 1) convolutedImage
